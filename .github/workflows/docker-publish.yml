@@ -57,5 +57,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }},${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:ffmperg5.1
+          tags: ${{ steps.meta.outputs.tags }},${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:ffmpeg5.1
           labels: ${{ steps.meta.outputs.labels }}
