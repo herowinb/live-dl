@@ -1,5 +1,8 @@
 FROM python:alpine
 
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.17/community' >> /etc/apk/repositories \
+	&& apk add "ffmpeg==5.1.3-r0"
+
 RUN apk add --no-cache aria2 \
 	&& adduser -D aria2 \
 	&& mkdir -p /etc/aria2 \
@@ -7,7 +10,6 @@ RUN apk add --no-cache aria2 \
 	&& rm -rf /var/lib/apk/lists/*
 
 RUN apk add --no-cache \
-  ffmpeg \
   tzdata \
   jq  \
   exiv2  \
