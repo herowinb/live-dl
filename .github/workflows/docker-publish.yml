@@ -2,10 +2,10 @@ name: Docker Publish
 
 on:
   push:
-    branches: [ ffmpeg5.1 ]
+    branches: [ master ]
     # Publish semver tags as releases.
   pull_request:
-    branches: [ ffmpeg5.1 ]
+    branches: [ master ]
     
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
