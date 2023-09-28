@@ -26,10 +26,10 @@ jobs:
       matrix:
         include:
           - dockerfile: ./Dockerfile
-            image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            image: ghcr.io/herowinb/live-dl
             tags: ${{ steps.meta.outputs.tags }},${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:latest
           - dockerfile: ./Dockerfile-ffmpeg5.1
-            image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            image: ghcr.io/herowinb/live-dl
             tags: ${{ steps.meta.outputs.tags }},${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:ffmpeg5.1
 
     steps:
