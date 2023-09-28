@@ -21,6 +21,16 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: ./Dockerfile
+            image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            tags: ${{ steps.meta.outputs.tags }},${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:latest
+          - dockerfile: ./Dockerfile-ffmpeg5.1
+            image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            tags: ${{ steps.meta.outputs.tags }},${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:ffmpeg5.1
 
     steps:
       - name: Checkout repository
@@ -48,7 +58,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@c4ee3adeed93b1fa6a762f209fb01608c1a22f1e
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ matrix.image }}
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -57,5 +67,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }},${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:ffmpeg5.1
+          file: ${{ matrix.dockerfile }}
+          tags: ${{ matrix.tags }}
           labels: ${{ steps.meta.outputs.labels }}
