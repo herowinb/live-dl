@@ -1685,6 +1685,7 @@ function func_finalize_download() {
       else
         curl -s "$THUMBNAIL_CALC" -o "$OUTPUT_PATH.jpg"
       fi
+    fi
   fi
 
   if [ $SKIP_METADATA == "false" ]; then
