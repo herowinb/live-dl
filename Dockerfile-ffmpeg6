@@ -1,4 +1,4 @@
-FROM python:alpine
+FROM python:alpine3.18
 
 RUN apk add --no-cache aria2 \
 	&& adduser -D aria2 \
