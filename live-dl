@@ -1500,22 +1500,41 @@ function func_archive_chat() {
   if [ $ARCHIVE_CHAT == "true" ]; then
     __info "Calling chat-downloader to run archive chat."
 
-    if [ $ARCHIVE_CHAT_MODE == "simple" ]; then
-      __debug "Running simple mode."
-      chat_downloader \
-        --cookies "$COOKIES_FILE" \
-        --format example \
-        --format_file ./config/chat-format.json \
-        --output "${OUTPUT_PATH}-chat.txt" \
-        "${WEBPAGE_URL}" >/dev/null 2>&1
+    # Update: chat_downloader need a valid cookies to work. So Live-DL will skip use cookies if it not a membership stream
+    if [[ "$DL_OPTION" == "membership" ]] || [[ "$PARAM_MEMBERSHIP" == "true" ]] ; then
 
-    elif [ $ARCHIVE_CHAT_MODE == "full" ]; then
-      __debug "Running full mode."
-      chat_downloader \
-        --cookies "$COOKIES_FILE" \
-        --output "${OUTPUT_PATH}-chat.json" \
-        "${WEBPAGE_URL}" >/dev/null 2>&1
+      if [ $ARCHIVE_CHAT_MODE == "simple" ]; then
+        __debug "Running simple mode. Using membership cookies."
+        chat_downloader \
+          --cookies "$COOKIES_FILE" \
+          --format example \
+          --format_file ./config/chat-format.json \
+          --output "${OUTPUT_PATH}-chat.txt" \
+          "${WEBPAGE_URL}" >/dev/null 2>&1
 
+      elif [ $ARCHIVE_CHAT_MODE == "full" ]; then
+        __debug "Running full mode. Using membership cookies."
+        chat_downloader \
+          --cookies "$COOKIES_FILE" \
+          --output "${OUTPUT_PATH}-chat.json" \
+          "${WEBPAGE_URL}" >/dev/null 2>&1
+      fi
+
+    else
+      if [ $ARCHIVE_CHAT_MODE == "simple" ]; then
+        __debug "Running simple mode. Not use membership cookies."
+        chat_downloader \
+          --format example \
+          --format_file ./config/chat-format.json \
+          --output "${OUTPUT_PATH}-chat.txt" \
+          "${WEBPAGE_URL}" >/dev/null 2>&1
+
+      elif [ $ARCHIVE_CHAT_MODE == "full" ]; then
+        __debug "Running full mode. Not use membership cookies."
+        chat_downloader \
+          --output "${OUTPUT_PATH}-chat.json" \
+          "${WEBPAGE_URL}" >/dev/null 2>&1
+      fi
     fi
 
   else
