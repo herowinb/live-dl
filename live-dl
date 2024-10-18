@@ -563,7 +563,7 @@ function func_check_state() {
     func_check_newlivestream_ytb
 
     # Passing useragent causes youtube to return the content to one line. Then grep died.
-    local _body=$(curl -s --compressed -H "User-Agent: $USER_AGENT" $address_param -b "$COOKIES_FILE" "$_url")
+    local _body=$(curl -L -s --compressed -H "User-Agent: $USER_AGENT" $address_param -b "$COOKIES_FILE" "$_url")
 
   fi
   # Extract metadata from fetched page
