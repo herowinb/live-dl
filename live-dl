@@ -744,7 +744,7 @@ function func_check_state() {
         __info "using address: ${_youtube_dl_address_param##* }"
       fi
       METADATA=`yt-dlp --ignore-config --no-playlist --playlist-items 0 --cookies "$COOKIES_FILE" \
-        --skip-download --print-json --extractor-args "youtube:player_client=ios" --referer 'https://www.youtube.com/feed/subscriptions' \
+        --skip-download --print-json --extractor-args "youtube:player-client=mweb" --referer 'https://www.youtube.com/feed/subscriptions' \
         -o '%(upload_date)s %(title)s (%(id)s).%(ext)s' \
         ${_youtube_dl_address_param} \
         "$_url" 2>&1`
@@ -1584,7 +1584,7 @@ function func_download_youtube() {
   		--fragment-retries 30 \
       --retries 30 \
       --live-from-start \
-      --extractor-args "youtube:player_client=ios" \
+      --extractor-args "youtube:player-client=mweb" \
       $FORTMAT_OPTION \
   		--cookies "$COOKIES_FILE" \
   		-o "${OUTPUT_PATH}${EXTENSION}" \
@@ -1611,7 +1611,7 @@ function func_download_youtube() {
         --add-metadata \
         --external-downloader aria2c \
         --external-downloader-args '-j 16 --retry-wait 10 --max-tries 10' \
-        --extractor-args "youtube:player_client=ios" \
+        --extractor-args "youtube:player-client=mweb" \
         -f "$FORTMAT_OPTION" \
         --retries 30 \
 		    --cookies "$COOKIES_FILE" \
@@ -1623,7 +1623,7 @@ function func_download_youtube() {
         --ignore-config \
         --external-downloader aria2c \
         --external-downloader-args '-j 16 --retry-wait 10 --max-tries 10' \
-        --extractor-args "youtube:player_client=ios" \
+        --extractor-args "youtube:player-client=mweb" \
         -f "$FORTMAT_OPTION" \
         --retries 30 \
 		    --cookies "$COOKIES_FILE" \
