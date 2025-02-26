@@ -702,7 +702,8 @@ function func_check_state() {
         # Youtube channel URL will be redirect to consent.youtube.com if you come from EU countries
 
         local _consent_URL=`echo "$_body" | grep -E -io 'href="[^\"]+"' | awk -F\" '{print$2}' | head -1`
-        if [ $_consent_URL = "https://consent.youtube.com/" ] || [ -z "$_body" ]; then
+        if [[ $_consent_URL = "https://consent.youtube.com/" ]] || [ -z "$_body" ]; then
+          func_send_discord "consent"
           __info "Youtube redirected to consent.youtube.com.
           Live-dl need cookies to detect live streams in Youtube channel page.
           For more information please read here: https://github.com/herowinb/live-dl/issues/23#issuecomment-1642585118"
@@ -1251,6 +1252,10 @@ function func_send_discord() {
       elif [ "$_type" == "cookies" ]; then
         local _body='{
           "content": " :warning: Can not detect member-only stream, make sure your cookies_membership.txt is not expired and from an account joined membership of channel '"$_url"'"
+        }'
+      elif [ "$_type" == "consent" ]; then
+        local _body='{
+          "content": " :warning: Youtube redirected to consent.youtube.com, Live-dl need cookies to detect live streams in Youtube channel page. '"$_url"'"
         }'
       fi
       __info "Sending Discord notification..."
