@@ -1,6 +1,6 @@
 FROM python:3.11.7-alpine3.17
 
-RUN apk add ffmpeg==5.1.4-r0
+RUN apk add --no-cache ffmpeg==5.1.4-r0
 
 RUN apk add --no-cache aria2 \
 	&& adduser -D aria2 \
