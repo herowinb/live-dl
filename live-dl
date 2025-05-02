@@ -702,7 +702,7 @@ function func_check_state() {
         # Youtube channel URL will be redirect to consent.youtube.com if you come from EU countries
 
         local _consent_URL=`echo "$_body" | grep -E -io 'href="[^\"]+"' | awk -F\" '{print$2}' | head -1`
-        if [ "$_consent_URL" =~ "consent.youtube.com" ] || [ -z "$_body" ]; then
+        if [[ "$_consent_URL" =~ "consent.youtube.com" ]] || [[ -z "$_body" ]]; then
           func_send_discord "consent"
           __info "Youtube redirected to consent.youtube.com.
           Live-dl need cookies to detect live streams in Youtube channel page.
