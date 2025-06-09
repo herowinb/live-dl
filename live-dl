@@ -423,7 +423,7 @@ function func_check_membership() {
     # Take VideoID from first SCHEDULED member-only video(s) in Membership tab, scheduled time less than 2h
     local _VIDEO_ID=`echo "$MEMBER_JSON" | jq -r '.tabRenderer.content.sectionListRenderer.contents[1].itemSectionRenderer.contents[] | \
     select((.videoRenderer!=null) and (.videoRenderer.lengthText==null) and (.videoRenderer.upcomingEventData.startTime<"'$TIME_NOW_MEMBER'")
-    and (.videoRenderer.badges[].metadataBadgeRenderer.label=="Members only"))' | \
+    and (.videoRenderer.badges[].metadataBadgeRenderer.style=="BADGE_STYLE_TYPE_MEMBERS_ONLY"))' | \
      jq -r '.videoRenderer.videoId'| head -1`
 
     if [ -n "$_VIDEO_ID" ]; then
