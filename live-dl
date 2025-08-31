@@ -575,9 +575,11 @@ function func_check_state() {
   else
 
     func_check_newlivestream_ytb
-
-    # Passing useragent causes youtube to return the content to one line. Then grep died.
-    local _body=$(curl -L -s --compressed -H "User-Agent: $USER_AGENT" $address_param -b "$COOKIES_FILE" "$_url")
+    # Skip check url again if not detect videoID
+    if [[ ! "$_url" =~ "/live" ]];then
+      # Passing useragent causes youtube to return the content to one line. Then grep died.
+      local _body=$(curl -L -s --compressed -H "User-Agent: $USER_AGENT" $address_param -b "$COOKIES_FILE" "$_url")
+    fi
 
   fi
   # Extract metadata from fetched page
@@ -712,7 +714,7 @@ function func_check_state() {
     # channel is not live. So just silent fail here.
     if ([ "$DL_TYPE" == "channel" ] && [ "$DL_PLATFORM" == "YouTube" ] ); then
 
-      if ([ "$DL_OPTION" != "membership" ]); then
+      if ([ "$DL_OPTION" != "membership" ] && [[ ! "$_url" =~ "/live" ]]); then
         # Youtube channel URL will be redirect to consent.youtube.com if you come from EU countries
 
         local _consent_URL=`echo "$_body" | grep -E -io 'href="[^\"]+"' | awk -F\" '{print$2}' | head -1`
