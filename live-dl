@@ -408,6 +408,9 @@ fi
 }
 
 function func_check_membership() {
+  # Since last week of Aug 2025, Youtube changed "Membership" tab layer again, so Live-DL will use "Streams" tab to get VideoID which scheduled or Live to detect membership stream. Also still check "Membership" tab, if it null => Cookies expire.
+  _url=`echo "$_url"|sed 's|/membership|/streams|'`
+  _url=`echo "$_url"|sed 's|/community|/streams|'`
   local _body=$(curl -s --compressed -H "User-Agent: $USER_AGENT" $address_param -b "$COOKIES_FILE" "$_url")
   # Check cookies_membership is valid by checking if the Membership tab exists or not.
   # All posts in Mebership tab are member-only.
@@ -415,16 +418,26 @@ function func_check_membership() {
   local MEMBER_JSON=`echo "$_body" | sed -n 's/.*var ytInitialData = \({[^<]*}\);.*/\1/p'| jq -r '.contents.twoColumnBrowseResultsRenderer.tabs[] |\
                                           select(.tabRenderer.endpoint.commandMetadata.webCommandMetadata.url | endswith("/membership"))' 2>/dev/null`
 
+  local STREAMS_MB_JSON=`echo "$_body" | sed -n 's/.*var ytInitialData = \({[^<]*}\);.*/\1/p'| jq -r '.contents.twoColumnBrowseResultsRenderer.tabs[] |\
+                                          select(.tabRenderer.endpoint.commandMetadata.webCommandMetadata.url | endswith("/streams"))' 2>/dev/null`
+
   if [[ ! -z $(printf '%s' $MEMBER_JSON) ]] ; then
 
-    local TIME_NOW_MEMBER=`date +%s`
-    local TIME_NOW_MEMBER=`expr $TIME_NOW_MEMBER + 7200`
+    local _VIDEO_ID=`echo "$STREAMS_MB_JSON" | jq -r '.tabRenderer.content.richGridRenderer.contents[] |\
+    select((.richItemRenderer.content.videoRenderer.thumbnailOverlays[]?.thumbnailOverlayTimeStatusRenderer.style=="LIVE") and (.richItemRenderer.content.videoRenderer.badges[]?.metadataBadgeRenderer.style=="BADGE_STYLE_TYPE_MEMBERS_ONLY"))' |\
+    jq -r '.richItemRenderer.content.videoRenderer.videoId' | head -1`
 
-    # Take VideoID from first SCHEDULED member-only video(s) in Membership tab, scheduled time less than 2h
-    local _VIDEO_ID=`echo "$MEMBER_JSON" | jq -r '.tabRenderer.content.sectionListRenderer.contents[1].itemSectionRenderer.contents[] | \
-    select((.videoRenderer!=null) and (.videoRenderer.lengthText==null) and (.videoRenderer.upcomingEventData.startTime<"'$TIME_NOW_MEMBER'")
-    and (.videoRenderer.badges[].metadataBadgeRenderer.style=="BADGE_STYLE_TYPE_MEMBERS_ONLY"))' | \
-     jq -r '.videoRenderer.videoId'| head -1`
+    if [ -z "$_VIDEO_ID" ]; then
+      __debug "Can not detect living stream, checking schedule streams (membership function)."
+      local TIME_NOW_MEMBER=`date +%s`
+      local TIME_NOW_MEMBER=`expr $TIME_NOW_MEMBER + 7200`
+
+      # Take VideoID from first SCHEDULED member-only video(s) in Membership tab, scheduled time less than 2h
+      local _VIDEO_ID=`echo "$STREAMS_MB_JSON" | jq -r '.tabRenderer.content.richGridRenderer.contents[] |\
+      select((.richItemRenderer.content.videoRenderer.videoId!=null) and (.richItemRenderer.content.videoRenderer.lengthText == null) and (.richItemRenderer.content.videoRenderer.upcomingEventData.startTime<"'$TIME_NOW_MEMBER'") \
+      and (.richItemRenderer.content.videoRenderer.badges[].metadataBadgeRenderer.style=="BADGE_STYLE_TYPE_MEMBERS_ONLY"))' |\
+       jq -r '.richItemRenderer.content.videoRenderer.videoId' | head -1`
+    fi
 
     if [ -n "$_VIDEO_ID" ]; then
       _url="https://www.youtube.com/watch?v=$_VIDEO_ID"
@@ -448,7 +461,7 @@ function func_check_membership() {
 # Since 2023/07/13 (?), youtube no longer redirecting /live if more than 1 stream is live or scheduled
 # This func created to get videoId have status "LIVE" from streams/live tab or scheduled stream which scheduled time less than 2h
 function func_check_newlivestream_ytb() {
-if ([ "$DL_TYPE" == "channel" ] && [ "$DL_PLATFORM" == "YouTube" ]); then
+if ([ "$DL_TYPE" == "channel" ] && [ "$DL_PLATFORM" == "YouTube" ] && [ "$DL_OPTION" != "membership" ]); then
   __debug "start func_check_newlivestream_ytb"
 
   local _body=$(curl -s --compressed -H "User-Agent: $USER_AGENT" $address_param -b "$COOKIES_FILE" "$_url")
@@ -457,7 +470,7 @@ if ([ "$DL_TYPE" == "channel" ] && [ "$DL_PLATFORM" == "YouTube" ]); then
   select(.tabRenderer.endpoint.commandMetadata.webCommandMetadata.url | endswith("/streams"))' 2>/dev/null`
 
   local _VIDEO_ID=`echo "$LIVE_TAB_URL" | jq -r '.tabRenderer.content.richGridRenderer.contents[] |\
-  select(.richItemRenderer.content.videoRenderer.thumbnailOverlays[0].thumbnailOverlayTimeStatusRenderer.style=="LIVE")' |\
+  select(.richItemRenderer.content.videoRenderer.thumbnailOverlays[]?.thumbnailOverlayTimeStatusRenderer.style=="LIVE")' |\
   jq -r '.richItemRenderer.content.videoRenderer.videoId' | head -1`
 
   if [ -n "$_VIDEO_ID" ]; then
