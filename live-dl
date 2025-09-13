@@ -576,7 +576,7 @@ function func_check_state() {
 
     func_check_newlivestream_ytb
     # Skip check url again if not detect videoID
-    if [[ ! "$_url" =~ "/live" ]];then
+    if [[ ! "$_url" =~ "/channel" ]] || [[ !  "$_url" =~ "/live" && "$_url" =~ "/@" ]];then
       # Passing useragent causes youtube to return the content to one line. Then grep died.
       local _body=$(curl -L -s --compressed -H "User-Agent: $USER_AGENT" $address_param -b "$COOKIES_FILE" "$_url")
     fi
