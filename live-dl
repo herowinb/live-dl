@@ -461,6 +461,9 @@ function func_check_membership() {
 # Since 2023/07/13 (?), youtube no longer redirecting /live if more than 1 stream is live or scheduled
 # This func created to get videoId have status "LIVE" from streams/live tab or scheduled stream which scheduled time less than 2h
 function func_check_newlivestream_ytb() {
+# Replace /live with /streams in URL
+local _url=${_url/live/streams}
+
 if ([ "$DL_TYPE" == "channel" ] && [ "$DL_PLATFORM" == "YouTube" ] && [ "$DL_OPTION" != "membership" ]); then
   __debug "start func_check_newlivestream_ytb"
 
