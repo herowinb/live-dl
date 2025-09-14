@@ -497,6 +497,7 @@ if ([ "$DL_TYPE" == "channel" ] && [ "$DL_PLATFORM" == "YouTube" ] && [ "$DL_OPT
       __debug "Detected live stream $_url"
     else
       __debug "Can not detect scheduled stream which scheduled time less than 2h"
+      PLAYABILITY="LIVE_STREAM_OFFLINE"
     fi
   fi
 fi
@@ -718,7 +719,7 @@ function func_check_state() {
     # channel is not live. So just silent fail here.
     if ([ "$DL_TYPE" == "channel" ] && [ "$DL_PLATFORM" == "YouTube" ] ); then
 
-      if ([ "$DL_OPTION" != "membership" ] && [[ ! "$_url" =~ "/live" ]]); then
+      if ([ "$DL_OPTION" != "membership" ] && [[ ! "$_url" =~ "/live" ]] && [[ ! "$PLAYABILITY" == "LIVE_STREAM_OFFLINE" ]]); then
         # Youtube channel URL will be redirect to consent.youtube.com if you come from EU countries
 
         local _consent_URL=`echo "$_body" | grep -E -io 'href="[^\"]+"' | awk -F\" '{print$2}' | head -1`
