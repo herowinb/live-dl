@@ -18,7 +18,8 @@ RUN apk add --no-cache \
   coreutils \
   grep
 
-RUN pip install --no-cache-dir bottle yt-dlp chat-downloader yq
+RUN pip install --no-cache-dir bottle yt-dlp yq
+RUN pip install https://github.com/stradus64/chat-downloader/archive/refs/heads/fix_issue_271.zip
 
 WORKDIR /usr/local/bin/
 ADD https://github.com/Kethsar/ytarchive/releases/download/latest/ytarchive_linux_amd64.zip /usr/local/bin/
@@ -26,7 +27,7 @@ RUN unzip ytarchive_linux_amd64.zip && rm -rf ytarchive_linux_amd64.zip
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-COPY live-dl autoscript.sh youtube-dl-server.py index.html /usr/src/app
+COPY live-dl autoscript.sh youtube-dl-server.py index.html /usr/src/app/
 COPY /config /usr/src/app/config
 COPY /static /usr/src/app/static
 RUN chmod a+x /usr/src/app/live-dl \
