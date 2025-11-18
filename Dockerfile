@@ -16,7 +16,8 @@ RUN apk add --no-cache \
   curl  \
   perl  \
   coreutils \
-  grep
+  grep \
+  deno
 
 RUN pip install --no-cache-dir bottle yt-dlp yq
 RUN pip install https://github.com/stradus64/chat-downloader/archive/refs/heads/fix_issue_271.zip
