@@ -20,8 +20,6 @@ RUN apk add --no-cache \
 RUN pip install --no-cache-dir bottle yt-dlp chat-downloader yq
 
 WORKDIR /usr/local/bin/
-ADD https://github.com/Kethsar/ytarchive/releases/download/latest/ytarchive_linux_amd64.zip /usr/local/bin/
-RUN unzip ytarchive_linux_amd64.zip && rm -rf ytarchive_linux_amd64.zip
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app

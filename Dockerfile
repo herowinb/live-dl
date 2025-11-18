@@ -22,8 +22,6 @@ RUN pip install --no-cache-dir bottle yt-dlp yq
 RUN pip install https://github.com/stradus64/chat-downloader/archive/refs/heads/fix_issue_271.zip
 
 WORKDIR /usr/local/bin/
-ADD https://github.com/Kethsar/ytarchive/releases/download/latest/ytarchive_linux_amd64.zip /usr/local/bin/
-RUN unzip ytarchive_linux_amd64.zip && rm -rf ytarchive_linux_amd64.zip
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app

@@ -122,8 +122,8 @@ while [ $# -gt 0 ]; do
       PARAM_NO_LOG=true
       shift
       ;;
+    # Keep this option for backward compatibility, but ignore it.
     -yt|--ytarchive)
-      PARAM_YTARCHIVE=true
       shift
       ;;
     -ao|--audio-only)
@@ -1578,43 +1578,22 @@ function func_download_youtube() {
 
   if [ "$CONTENT_STATE" == "live" ]; then
 
-    if [ "$YTARCHIVE" == "true" ]; then
+    if [ "$PARAM_AUDIO_ONLY" == "true" ]; then
+      FORTMAT_OPTION="-f 91 -x"
+    fi
 
-      if [ "$PARAM_AUDIO_ONLY" == "true" ]; then
-        FORTMAT_OPTION="audio_only"
-      else
-        FORTMAT_OPTION="best"
-      fi
-
-      ytarchive \
-        --no-wait \
-        -o "${OUTPUT_PATH}" \
-        -c "$COOKIES_FILE" \
-        --save \
-        --merge \
-        --no-frag-files \
-        -r 30 \
-        "${WEBPAGE_URL}" $FORTMAT_OPTION >> "$LOG_PATH" 2>&1
-
-    else
-
-      if [ "$PARAM_AUDIO_ONLY" == "true" ]; then
-        FORTMAT_OPTION="-f 91 -x"
-      fi
-
-  	yt-dlp \
-  		--ignore-config \
+    yt-dlp \
+      --ignore-config \
       --hls-prefer-native \
-  		--hls-use-mpegts \
+      --hls-use-mpegts \
       --no-part \
-  		--fragment-retries 30 \
+      --fragment-retries 30 \
       --retries 30 \
       --live-from-start \
       $FORTMAT_OPTION \
-  		--cookies "$COOKIES_FILE" \
-  		-o "${OUTPUT_PATH}${EXTENSION}" \
-  		"${WEBPAGE_URL}" >> "$LOG_PATH" 2>&1
-    fi
+      --cookies "$COOKIES_FILE" \
+      -o "${OUTPUT_PATH}${EXTENSION}" \
+      "${WEBPAGE_URL}" >> "$LOG_PATH" 2>&1
 
   elif [ "$CONTENT_STATE" == "video" ]; then
 
@@ -1881,7 +1860,6 @@ Options:
   --debug                     Show debug logs, default: false
   --no-log, -nl               No logs mode
   --audio-only, -ao           Audio only mode
-  --ytarchive, -yt            Use YTARCHIVE for Youtube Live stream
   --image-proxy               Enable image proxy for China users, default: false"
   exit 1
 fi
@@ -1910,7 +1888,6 @@ HOME_EXPANDED=$(echo "$HOME" | sed -e 's/\//\\\//g')
 CONFIG_MODE=`echo $CONFIG_RAW | jq -r '.config.mode | select(.!=null)'`
 CONFIG_BASE_DIR=`echo $CONFIG_RAW | jq -r .config.output | sed -e 's/~/'"$HOME_EXPANDED"'/g'`
 CONFIG_NO_LOG=`echo $CONFIG_RAW | jq -r '.config.no_log | select(.!=null)'`
-CONFIG_YTARCHIVE=`echo $CONFIG_RAW | jq -r '.config.ytarchive | select(.!=null)'`
 CONFIG_DIR_MEMBERSHIP=`echo $CONFIG_RAW | jq -r '.config.dir_membership | select(.!=null)'`
 CONFIG_REMOVE_TITLE=`echo $CONFIG_RAW | jq -r '.config.remove_title | select(.!=null)'`
 CONFIG_ARCHIVE_CHAT=`echo $CONFIG_RAW | jq -r '.config.archive_chat | select(.!=null)'`
@@ -1967,7 +1944,6 @@ ADDRESS_POOL_FILE="${PARAM_ADDRESS_POOL_FILE:-$CONFIG_ADDRESS_POOL_FILE}"
 ONE_TIME="${PARAM_ONE_TIME:-$CONFIG_ONE_TIME}"
 IMAGE_PROXY="${PARAM_IMAGE_PROXY:-$CONFIG_IMAGE_PROXY}"
 NO_LOG="${PARAM_NO_LOG:-$CONFIG_NO_LOG}"
-YTARCHIVE="${PARAM_YTARCHIVE:-$CONFIG_YTARCHIVE}"
 URL_INPUT="$1"
 
 if [ "IMAGE_PROXY" != "true" ]; then
@@ -1980,18 +1956,13 @@ else
   MODE_AUDIO_TEXT=""
 fi
 
-if [ "$YTARCHIVE" == "true" ]; then
-  YTARCHIVE_TEXT="- Using YTARCHIVE"
-else
-  YTARCHIVE_TEXT=""
-fi
 
 # Run check update first
 func_check_update
 
 # Print current variables for reference
 __info "URL (URI) to process           : ${URL_INPUT}"
-__info "Mode                           : ${MODE} ${YTARCHIVE_TEXT} ${MODE_AUDIO_TEXT}"
+__info "Mode                           : ${MODE} ${MODE_AUDIO_TEXT}"
 __info "Output base dir                : ${BASE_DIR}"
 __info "Separate folder for membership : ${CONFIG_DIR_MEMBERSHIP}"
 __info "Remove Title                   : ${REMOVE_TITLE}"
