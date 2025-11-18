@@ -1653,6 +1653,7 @@ function func_download_twitch() {
   		--hls-use-mpegts \
       --no-part \
   		--fragment-retries 30 \
+      --live-from-start \
       --retries 60 \
       $FORTMAT_OPTION \
   		--cookies "$COOKIES_FILE" \
@@ -1689,7 +1690,7 @@ function func_finalize_download() {
   # Check thumbnail width
   THUMB_W=`exiv2 "$OUTPUT_PATH.jpg" | awk -F: '/Image size/ {print $2}' | cut -dx -f1 | tr -d ' '`
   if [ "$THUMB_W" -lt "1280" ]; then
-    __info "Thumbnail ($THUMBNAIL_CALC) downloeded via youtube-dl is too small, try our own method"
+    __info "Thumbnail ($THUMBNAIL_CALC) downloaded via youtube-dl is too small, try our own method"
 
     # Re-assign thumbnail URL
     THUMBNAIL_CALC="https://i.ytimg.com/vi/$VIDEO_ID/maxresdefault.jpg"
