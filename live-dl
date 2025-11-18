@@ -435,7 +435,7 @@ function func_check_membership() {
       # Take VideoID from first SCHEDULED member-only video(s) in Membership tab, scheduled time less than 2h
       local _VIDEO_ID=`echo "$STREAMS_MB_JSON" | jq -r '.tabRenderer.content.richGridRenderer.contents[] |\
       select((.richItemRenderer.content.videoRenderer.videoId!=null) and (.richItemRenderer.content.videoRenderer.lengthText == null) and (.richItemRenderer.content.videoRenderer.upcomingEventData.startTime<"'$TIME_NOW_MEMBER'") \
-      and (.richItemRenderer.content.videoRenderer.badges[].metadataBadgeRenderer.style=="BADGE_STYLE_TYPE_MEMBERS_ONLY"))' |\
+      and (.richItemRenderer.content.videoRenderer.badges[]?.metadataBadgeRenderer.style=="BADGE_STYLE_TYPE_MEMBERS_ONLY"))' |\
        jq -r '.richItemRenderer.content.videoRenderer.videoId' | head -1`
     fi
 
