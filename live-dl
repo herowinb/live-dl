@@ -18,6 +18,7 @@
 # - yt-dlp
 # - yq (python-yq)
 # - chat-downloader
+# - deno (for yt-dlp)
 
 # 2023.2.18
 # youtube-dl no longer can get "uploader id" because Youtube change it to Handle URL
@@ -1454,6 +1455,7 @@ function func_create_file_name() {
      [ -f "$output_dir/${file_base_name}.m4a" ] || \
      [ -f "$output_dir/${file_base_name}.log" ] || \
      [ -f "$output_dir/${file_base_name}.jpg" ] || \
+     [ -f "$output_dir/${file_base_name}-chat.txt" ] || \
      [ -f "$output_dir/${file_base_name}.finished" ]
   then
     local -i NUM_POSTFIX=1
@@ -1580,6 +1582,8 @@ function func_download_youtube() {
 
     if [ "$PARAM_AUDIO_ONLY" == "true" ]; then
       FORTMAT_OPTION="-f 91 -x"
+    else
+      FORTMAT_OPTION="-f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'"
     fi
 
     yt-dlp \
