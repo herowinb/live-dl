@@ -1583,7 +1583,7 @@ function func_download_youtube() {
     if [ "$PARAM_AUDIO_ONLY" == "true" ]; then
       FORTMAT_OPTION="-f 91 -x"
     else
-      FORTMAT_OPTION="-f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'"
+      FORTMAT_OPTION="-f bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
     fi
 
     yt-dlp \
