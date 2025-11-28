@@ -19,7 +19,7 @@ RUN apk add --no-cache \
   grep \
   deno
 
-RUN pip install --no-cache-dir bottle yt-dlp-ejs yq
+RUN pip install --no-cache-dir bottle yt-dlp yt-dlp-ejs yq
 RUN pip install https://github.com/stradus64/chat-downloader/archive/refs/heads/fix_issue_271.zip
 
 WORKDIR /usr/local/bin/
