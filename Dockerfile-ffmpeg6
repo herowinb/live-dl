@@ -24,7 +24,7 @@ WORKDIR /usr/local/bin/
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-COPY live-dl autoscript.sh youtube-dl-server.py index.html /usr/src/app
+COPY live-dl autoscript.sh youtube-dl-server.py index.html /usr/src/app/
 COPY /config /usr/src/app/config
 COPY /static /usr/src/app/static
 RUN chmod a+x /usr/src/app/live-dl \
