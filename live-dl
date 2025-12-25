@@ -1474,7 +1474,11 @@ function func_finalize_vars() {
   # i.e.
   # 天宮 こころ / Kokoro Amamiya 【にじさんじ所属】 will become:
   # 天宮 こころ／Kokoro Amamiya 【にじさんじ所属】
-  EXTENSION=".mp4"
+  if [ "$PARAM_AUDIO_ONLY" == "true" ]; then
+    EXTENSION=".m4a"
+  else
+    EXTENSION=".mp4"
+  fi
   FILENAME_BASE=$(echo "$UPLOADER" | sed "s/\//／/" | sed "s/ ／ /／/")
 
   # Output base without filename
@@ -1581,7 +1585,7 @@ function func_download_youtube() {
   if [ "$CONTENT_STATE" == "live" ]; then
 
     if [ "$PARAM_AUDIO_ONLY" == "true" ]; then
-      FORTMAT_OPTION="-f 91 -x"
+      FORTMAT_OPTION="-f bestaudio*"
     else
       FORTMAT_OPTION="-f bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
     fi
