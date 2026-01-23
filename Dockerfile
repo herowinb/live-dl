@@ -17,9 +17,11 @@ RUN apk add --no-cache \
   perl  \
   coreutils \
   grep \
-  deno
+  deno \
+  git
 
-RUN pip install --no-cache-dir bottle yt-dlp yt-dlp-ejs yq
+RUN pip install --no-cache-dir --upgrade "yt-dlp @ git+https://github.com/yt-dlp/yt-dlp.git"
+RUN pip install --no-cache-dir bottle yt-dlp-ejs yq
 RUN pip install https://github.com/stradus64/chat-downloader/archive/refs/heads/fix_issue_271.zip
 
 WORKDIR /usr/local/bin/
