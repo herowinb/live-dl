@@ -268,6 +268,11 @@ function func_create_url() {
       DL_URL="$_url"
       DL_TYPE="video"
 
+    elif [[ "$_url" =~ "/live/"* ]]; then
+      __info "YouTube video detected (live URL)"
+      DL_URL="$_url"
+      DL_TYPE="video"
+
     elif [[ "$_url" =~ "/playlist"* ]]; then
       __info "YouTube playlist detected"
       DL_URL="$_url"
