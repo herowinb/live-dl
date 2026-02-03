@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Light WebGUI Editor</title>
+
+<!-- CodeMirror -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/yaml/yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/shell/shell.min.js"></script>
+
+<!-- YAML parser -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+
+
+
+<style>
+body {
+    background: #0f172a;
+    color: #e5e7eb;
+    font-family: system-ui, sans-serif;
+    padding: 20px;
+}
+select, button {
+    background: #1e293b;
+    color: #e5e7eb;
+    border: 1px solid #334155;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.CodeMirror {
+    height: 70vh;
+    margin-top: 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    border: 2px solid #334155;
+}
+.CodeMirror.invalid {
+    border-color: #ef4444;
+}
+.status {
+    margin-top: 10px;
+    font-size: 14px;
+}
+.error {
+    color: #ef4444;
+}
+.success {
+    color: #22c55e;
+}
+.topbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Light WebGUI Editor</h2>
+
+<form method="post" id="editorForm">
+<div class="topbar">
+    <label>File:</label>
+    <select name="filename" onchange="this.form.submit()">
+        % for f in files:
+            <option value="{{f}}" {{'selected' if f == current else ''}}>{{f}}</option>
+        % end
+    </select>
+
+    <button id="saveBtn" type="submit" name="save" value="1">💾 Save</button>
+</div>
+
+<textarea id="editor" name="content">{{content}}</textarea>
+</form>
+
+<div id="status" class="status"></div>
+
+% if saved:
+<div class="status success">✔ Saved successfully</div>
+% end
+
+<script>
+const textarea = document.getElementById("editor");
+const fileSelect = document.querySelector("select[name='filename']");
+const status = document.getElementById("status");
+const saveBtn = document.getElementById("saveBtn");
+
+let cm = CodeMirror.fromTextArea(textarea, {
+    mode: "text/plain",
+    theme: "material-darker",
+    lineNumbers: true,
+    indentUnit: 2,
+    tabSize: 2,
+    indentWithTabs: false,
+    lineWrapping: true
+});
+
+function isYamlFile(name) {
+    return name.endsWith(".yaml") || name.endsWith(".yml");
+}
+
+function isShellFile(name) {
+    return name.endsWith(".sh");
+}
+
+function clearStatus() {
+    cm.getWrapperElement().classList.remove("invalid");
+    status.textContent = "";
+    status.className = "status";
+    saveBtn.disabled = false;
+}
+
+function validateYAML() {
+    try {
+        jsyaml.load(cm.getValue());
+        status.textContent = "✔ YAML is valid";
+        status.className = "status success";
+        cm.getWrapperElement().classList.remove("invalid");
+        saveBtn.disabled = false;
+    } catch (e) {
+        status.textContent = "❌ YAML error: " + e.message;
+        status.className = "status error";
+        cm.getWrapperElement().classList.add("invalid");
+        saveBtn.disabled = true;
+    }
+}
+
+function updateEditorMode() {
+    const filename = fileSelect.value;
+
+    if (isYamlFile(filename)) {
+        cm.setOption("mode", "yaml");
+        validateYAML();
+        return;
+    }
+
+    if (isShellFile(filename)) {
+        cm.setOption("mode", "shell");
+        clearStatus();
+        return;
+    }
+
+    cm.setOption("mode", "text/plain");
+    clearStatus();
+}
+
+cm.on("change", () => {
+    if (isYamlFile(fileSelect.value)) {
+        validateYAML();
+    }
+});
+
+fileSelect.addEventListener("change", updateEditorMode);
+
+// Initial
+updateEditorMode();
+
+// Sync before submit
+document.getElementById("editorForm").addEventListener("submit", () => {
+    cm.save();
+});
+</script>
+
+
+</body>
+</html>
