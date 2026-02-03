@@ -19,6 +19,7 @@
  * Audio only mode (Not apply to Twitch)
  * No log mode
  * Use [YTARCHIVE.py](https://github.com/Kethsar/ytarchive) to download Youtube Live Stream. If you not change config, Live-dl still use default Youtube-dl
+ * A light WebUI Editor for config files. Default user/pass: admin/live-dl. You can change it by set ENV `EDITOR_USER` and `EDITOR_PASS` in your docker containor.
 
 <img src="https://i.imgur.com/kIJUOIs.png">
 
