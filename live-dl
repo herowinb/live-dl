@@ -80,6 +80,8 @@ __info() {
 __debug() {
   DEBUG="${PARAM_DEBUG:-"false"}"
   if [ "$DEBUG" == "true" ]; then
+    # Enforce output log files when in debug mode
+    NO_LOG=false
     printf "[$(date)] DEBUG: %s\n" "$1"
   fi
 }
