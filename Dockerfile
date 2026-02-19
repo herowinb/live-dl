@@ -1,6 +1,6 @@
-FROM python:alpine3.21
+FROM python:alpine3.22
 
-RUN apk add --no-cache ffmpeg==6.1.2-r1
+RUN apk add --no-cache ffmpeg==6.1.2-r2
 
 RUN apk add --no-cache aria2 \
 	&& adduser -D aria2 \
