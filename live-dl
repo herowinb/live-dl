@@ -468,6 +468,9 @@ function func_check_membership() {
 
 # Since 2023/07/13 (?), youtube no longer redirecting /live if more than 1 stream is live or scheduled
 # This func created to get videoId have status "LIVE" from streams/live tab or scheduled stream which scheduled time less than 2h
+
+# Since 2026/05/05 (?), youtube is rolling out new metadata structure in ytInitialData /streams tab, no more upcomingEventData.startTime for upcoming streaming. It still not rolling out for all regions/languages.
+# Also since /live now be fixed and redirecting to the stream is living (even the channel still have scheduled streams) so maybe don't need this func anymore.
 function func_check_newlivestream_ytb() {
 
 if ([ "$DL_TYPE" == "channel" ] && [ "$DL_PLATFORM" == "YouTube" ] && [ "$DL_OPTION" != "membership" ]); then
@@ -485,6 +488,13 @@ if ([ "$DL_TYPE" == "channel" ] && [ "$DL_PLATFORM" == "YouTube" ] && [ "$DL_OPT
   select(.richItemRenderer.content.videoRenderer.thumbnailOverlays[]?.thumbnailOverlayTimeStatusRenderer.style=="LIVE")' |\
   jq -r '.richItemRenderer.content.videoRenderer.videoId' | head -1`
 
+  # Temporary add a quick fix for new metadatas.
+  if [ ! "$_VIDEO_ID" ]; then
+    local _VIDEO_ID=`echo "$LIVE_TAB_URL" | jq -r '.tabRenderer.content.richGridRenderer.contents[] |\
+    select(.richItemRenderer.content.lockupViewModel.contentImage.thumbnailViewModel.overlays[]?.thumbnailBottomOverlayViewModel.badges[]?.thumbnailBadgeViewModel.badgeStyle=="THUMBNAIL_OVERLAY_BADGE_STYLE_LIVE")' |\
+    jq -r '.richItemRenderer.content.lockupViewModel.contentId' | head -1`
+  fi
+
   if [ -n "$_VIDEO_ID" ]; then
     _url="https://www.youtube.com/watch?v=$_VIDEO_ID"
     __debug "Detected live stream $_url"
@@ -496,6 +506,7 @@ if ([ "$DL_TYPE" == "channel" ] && [ "$DL_PLATFORM" == "YouTube" ] && [ "$DL_OPT
     local TIME_NOW_LIVE=`date +%s`
     local TIME_NOW_LIVE=`expr $TIME_NOW_LIVE + 7200`
 
+    # no more time for upcoming streaming so this also failed.
     local _VIDEO_ID=`echo "$LIVE_TAB_URL" | jq -r '.tabRenderer.content.richGridRenderer.contents[] |\
     select((.richItemRenderer.content.videoRenderer.videoId!=null) and (.richItemRenderer.content.videoRenderer.lengthText == null) and (.richItemRenderer.content.videoRenderer.upcomingEventData.startTime<"'$TIME_NOW_LIVE'"))' |\
     jq -r '.richItemRenderer.content.videoRenderer.videoId' | head -1`
