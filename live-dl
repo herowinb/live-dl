@@ -435,6 +435,15 @@ function func_check_membership() {
     select((.richItemRenderer.content.videoRenderer.thumbnailOverlays[]?.thumbnailOverlayTimeStatusRenderer.style=="LIVE") and (.richItemRenderer.content.videoRenderer.badges[]?.metadataBadgeRenderer.style=="BADGE_STYLE_TYPE_MEMBERS_ONLY"))' |\
     jq -r '.richItemRenderer.content.videoRenderer.videoId' | head -1`
 
+    # Temporary add a quick fix for new metadatas, membership streams.
+    if [ ! "$_VIDEO_ID" ]; then
+      local _VIDEO_ID=`echo "$STREAMS_MB_JSON" | jq -r '.tabRenderer.content.richGridRenderer.contents[] |\
+      select((.richItemRenderer.content.lockupViewModel.metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.badges[]?.badgeViewModel.badgeStyle=="BADGE_MEMBERS_ONLY") \
+      and (.richItemRenderer.content.lockupViewModel.contentImage.thumbnailViewModel.overlays[]?.thumbnailBottomOverlayViewModel.badges[]?.thumbnailBadgeViewModel.badgeStyle=="THUMBNAIL_OVERLAY_BADGE_STYLE_LIVE"))' |\
+      jq -r '.richItemRenderer.content.lockupViewModel.contentId' | head -1`
+    fi
+
+    # This should be failed too.
     if [ -z "$_VIDEO_ID" ]; then
       __debug "Can not detect living stream, checking schedule streams (membership function)."
       local TIME_NOW_MEMBER=`date +%s`
