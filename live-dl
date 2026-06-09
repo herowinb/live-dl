@@ -607,12 +607,16 @@ function func_check_state() {
 
   else
 
-    func_check_newlivestream_ytb
+    #func_check_newlivestream_ytb
+
     # Skip check url again if not detect videoID
-    if [[ ! "$_url" =~ "/channel" ]] || [[ !  "$_url" =~ "/live" && "$_url" =~ "/@" ]];then
-      # Passing useragent causes youtube to return the content to one line. Then grep died.
-      local _body=$(curl -L -s --compressed -H "User-Agent: $USER_AGENT" $address_param -b "$COOKIES_FILE" "$_url")
-    fi
+    #if [[ ! "$_url" =~ "/channel" ]] || [[ !  "$_url" =~ "/live" && "$_url" =~ "/@" ]];then
+    #  # Passing useragent causes youtube to return the content to one line. Then grep died.
+    #  local _body=$(curl -L -s --compressed -H "User-Agent: $USER_AGENT" $address_param -b "$COOKIES_FILE" "$_url")
+    #fi
+
+    # Passing useragent causes youtube to return the content to one line. Then grep died.
+    local _body=$(curl -L -s --compressed -H "User-Agent: $USER_AGENT" $address_param -b "$COOKIES_FILE" "$_url")
 
   fi
   # Extract metadata from fetched page
@@ -735,7 +739,11 @@ function func_check_state() {
         # Check if upcoming event available
         if [ ! -z "$UPCOMING_TIME" ]; then
           local _date_calc=`date -d @$UPCOMING_TIME`
+          TIME_NOW=`date +%s`
+          TIME_NOW=`expr $TIME_NOW + 7200`
+          if [[ $UPCOMING_TIME < $TIME_NOW ]]; then
           __info "$(__yellow "Upcoming event detected: $_date_calc")"
+          fi
         fi
       fi
     fi
