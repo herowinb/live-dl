@@ -431,29 +431,19 @@ function func_check_membership() {
 
   if [[ ! -z $(printf '%s' $MEMBER_JSON) ]] ; then
 
+    # Get videoID from "Streams" tab, which have badge "MEMBERS_ONLY" and "LIVE", this is the most reliable way to detect member-only stream. If it null => No member-only stream is live.
     local _VIDEO_ID=`echo "$STREAMS_MB_JSON" | jq -r '.tabRenderer.content.richGridRenderer.contents[] |\
-    select((.richItemRenderer.content.videoRenderer.thumbnailOverlays[]?.thumbnailOverlayTimeStatusRenderer.style=="LIVE") and (.richItemRenderer.content.videoRenderer.badges[]?.metadataBadgeRenderer.style=="BADGE_STYLE_TYPE_MEMBERS_ONLY"))' |\
-    jq -r '.richItemRenderer.content.videoRenderer.videoId' | head -1`
+    select((.richItemRenderer.content.lockupViewModel.metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows[]?.badges[]?.badgeViewModel.badgeStyle=="BADGE_MEMBERS_ONLY") \
+    and (.richItemRenderer.content.lockupViewModel.contentImage.thumbnailViewModel.overlays[]?.thumbnailBottomOverlayViewModel.badges[]?.thumbnailBadgeViewModel.badgeStyle=="THUMBNAIL_OVERLAY_BADGE_STYLE_LIVE"))' |\
+    jq -r '.richItemRenderer.content.lockupViewModel.contentId' | head -1`
 
-    # Temporary add a quick fix for new metadatas, membership streams.
-    if [ ! "$_VIDEO_ID" ]; then
-      local _VIDEO_ID=`echo "$STREAMS_MB_JSON" | jq -r '.tabRenderer.content.richGridRenderer.contents[] |\
-      select((.richItemRenderer.content.lockupViewModel.metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.badges[]?.badgeViewModel.badgeStyle=="BADGE_MEMBERS_ONLY") \
-      and (.richItemRenderer.content.lockupViewModel.contentImage.thumbnailViewModel.overlays[]?.thumbnailBottomOverlayViewModel.badges[]?.thumbnailBadgeViewModel.badgeStyle=="THUMBNAIL_OVERLAY_BADGE_STYLE_LIVE"))' |\
-      jq -r '.richItemRenderer.content.lockupViewModel.contentId' | head -1`
-    fi
-
-    # This should be failed too.
     if [ -z "$_VIDEO_ID" ]; then
       __debug "Can not detect living stream, checking schedule streams (membership function)."
-      local TIME_NOW_MEMBER=`date +%s`
-      local TIME_NOW_MEMBER=`expr $TIME_NOW_MEMBER + 7200`
 
-      # Take VideoID from first SCHEDULED member-only video(s) in Membership tab, scheduled time less than 2h
+      # Take VideoID from first SCHEDULED member-only video(s) in Membership tab.
       local _VIDEO_ID=`echo "$STREAMS_MB_JSON" | jq -r '.tabRenderer.content.richGridRenderer.contents[] |\
-      select((.richItemRenderer.content.videoRenderer.videoId!=null) and (.richItemRenderer.content.videoRenderer.lengthText == null) and (.richItemRenderer.content.videoRenderer.upcomingEventData.startTime<"'$TIME_NOW_MEMBER'") \
-      and (.richItemRenderer.content.videoRenderer.badges[]?.metadataBadgeRenderer.style=="BADGE_STYLE_TYPE_MEMBERS_ONLY"))' |\
-       jq -r '.richItemRenderer.content.videoRenderer.videoId' | head -1`
+      select(.richItemRenderer.content.lockupViewModel.metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows[]?.badges[]?.badgeViewModel.badgeStyle=="BADGE_MEMBERS_ONLY")' |\
+      jq -r '.richItemRenderer.content.lockupViewModel.contentId' | head -1`
     fi
 
     if [ -n "$_VIDEO_ID" ]; then
