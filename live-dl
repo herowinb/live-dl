@@ -792,7 +792,7 @@ function func_check_state() {
         __info "using address: ${_youtube_dl_address_param##* }"
       fi
       METADATA=`yt-dlp --ignore-config --no-playlist --playlist-items 0 --cookies "$COOKIES_FILE" \
-        --skip-download --print-json --referer 'https://www.youtube.com/feed/subscriptions' \
+        --skip-download --print-json --no-update --referer 'https://www.youtube.com/feed/subscriptions' \
         -o '%(upload_date)s %(title)s (%(id)s).%(ext)s' \
         ${_youtube_dl_address_param} \
         "$_url" 2>&1`
@@ -895,7 +895,7 @@ function func_check_state_twitch() {
         __info "using address: ${_youtube_dl_address_param##* }"
       fi
       METADATA=`yt-dlp --ignore-config --no-playlist --playlist-items 0 --cookies "$COOKIES_FILE" \
-        --skip-download --print-json --referer 'https://www.twitch.tv/directory' \
+        --skip-download --print-json --no-update --referer 'https://www.twitch.tv/directory' \
         -o '%(upload_date)s %(title)s (%(id)s).%(ext)s' \
         ${_youtube_dl_address_param} \
         "$_url" 2>&1`
