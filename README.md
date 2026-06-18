@@ -76,6 +76,21 @@ kill 94552
 Search my Docker Image `herowinb/live-dl` in Registry tab with keyword `live-dl`. Wait to complete download new image.
 Stop your Container `live-dl` running, update/edit new `config.yml`, `keyword.txt` or new config file … (if need). On your Container `live-dl` select Action and Clear then Start your Container again, it will update to new Image `live-dl`.
 
+# How run on TrueNAS SCALE
+
+You need use TrueNAS SCALE version 24.10 or above for native Docker support.
+On TrueNAS web GUI, use Custom App in `Apps -> Discover Apps` 
+
+* Input Repository `herowinb/live-dl`, tag `latest`
+* Pull Policy `Always pull an image even if it is present on the host` to auto update docker image when you edit and save this Custom App.
+* (Optional) Set Hostname, timezone, Environment Variables `EDITOR_PASS`
+* Set Restart Policy `Always - Restarts the container`
+* Set Ports `Host post` and `Container port 8080`, Protocol `TCP`
+* Storage Configuration, click Add 3 times:
+  * Type `Host Path` mount path `/youtube-dl` `/tmp` `/usr/src/app/config` with your shared folders on your TrueNAS.
+
+To update new image docker (new live-dl) on TrueNAS SCALE, just click edit Live-dl app and click save to make it pull new image docker.
+
 ## How monitor member only stream
 
 This feature help who joined membership but cannot watch live (time zone problem, busy with work or life) but don't want to miss out un-archive member only streams. Please remember that SHARING with non-members is **PROHIBITED**.
@@ -111,7 +126,7 @@ Create an Application and a Bot at https://discord.com/developers/, copy Bot tok
 * Create a temp Discord server, add your Bot to temp server (change xxxx = client ID in application) https://discord.com/api/oauth2/authorize?client_id=xxxx&scope=applications.commands
 * Click to Bot on Server User list (right panel) and send a Private Message to bot
 * Open https://discord.com/channels/@me/ on browser, select your Bot and copy channel ID (numbers after /@me/, put **between two `"`**) in to `config.yml` file
-* You can delete temp Discord server
+* If your turn off **Direct Messages and Friend requests** for All Server in `Setting -> Content & Social -> Social Permission`. By this setting, bot can not send DM to you. Please make sure you allow DM on temp server. If you still turn on **Direct Messages and Friend requests** for All Server, you can delete temp Discord server.
 
 <img src="https://i.imgur.com/jJIRwlH.png">
 
