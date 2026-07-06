@@ -792,7 +792,7 @@ function func_check_state() {
         __info "using address: ${_youtube_dl_address_param##* }"
       fi
       METADATA=`yt-dlp --ignore-config --no-playlist --playlist-items 0 --cookies "$COOKIES_FILE" \
-        --skip-download --print-json --no-warnings --referer 'https://www.youtube.com/feed/subscriptions' \
+        --skip-download -j --no-warnings --referer 'https://www.youtube.com/feed/subscriptions' \
         -o '%(upload_date)s %(title)s (%(id)s).%(ext)s' \
         ${_youtube_dl_address_param} \
         "$_url" 2>&1`
@@ -895,7 +895,7 @@ function func_check_state_twitch() {
         __info "using address: ${_youtube_dl_address_param##* }"
       fi
       METADATA=`yt-dlp --ignore-config --no-playlist --playlist-items 0 --cookies "$COOKIES_FILE" \
-        --skip-download --print-json --no-warnings --referer 'https://www.twitch.tv/directory' \
+        --skip-download -j --no-warnings --referer 'https://www.twitch.tv/directory' \
         -o '%(upload_date)s %(title)s (%(id)s).%(ext)s' \
         ${_youtube_dl_address_param} \
         "$_url" 2>&1`
@@ -1612,12 +1612,11 @@ function func_download_youtube() {
     if [ "$PARAM_AUDIO_ONLY" == "true" ]; then
       FORTMAT_OPTION="-f bestaudio*"
     else
-      FORTMAT_OPTION="-f bestvideo[format_id!*=-dash]+bestaudio[format_id!*=-dash]/best[ext=mp4]/best"
+      FORTMAT_OPTION="-f bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
     fi
 
     yt-dlp \
       --ignore-config \
-      --hls-prefer-native \
       --hls-use-mpegts \
       --no-part \
       --fragment-retries 30 \
@@ -1682,7 +1681,6 @@ function func_download_twitch() {
   if [ "$CONTENT_STATE" == "live" ]; then
   	yt-dlp \
   		--ignore-config \
-      --hls-prefer-native \
   		--hls-use-mpegts \
       --no-part \
   		--fragment-retries 30 \
