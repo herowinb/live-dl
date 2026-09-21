@@ -1,0 +1,59 @@
+FROM python:slim-bookworm
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    aria2 \
+    tzdata \
+    jq \
+    exiv2 \
+    bash \
+    curl \
+    perl \
+    coreutils \
+    grep \
+    git \
+    ca-certificates \
+    p7zip-full \
+    && rm -rf /var/lib/apt/lists/*
+
+
+RUN curl -fsSL https://deno.land/install.sh | sh \
+    && ln -s /root/.deno/bin/deno /usr/local/bin/deno
+
+RUN useradd --create-home --shell /bin/bash aria2 \
+    && mkdir -p /etc/aria2 \
+    && mkdir -p /aria2down
+
+RUN pip install --no-cache-dir --upgrade \
+    "yt-dlp @ git+https://github.com/yt-dlp/yt-dlp.git"
+
+RUN pip install --no-cache-dir \
+    bottle \
+    yt-dlp-ejs \
+    yq
+
+RUN pip install --no-cache-dir \
+    https://github.com/Indigo128/chat-downloader/archive/refs/heads/master.zip
+
+WORKDIR /usr/local/bin/
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+COPY live-dl autoscript.sh youtube-dl-server.py index.html /usr/src/app/
+COPY /config /usr/src/app/config
+COPY /static /usr/src/app/static
+RUN chmod a+x /usr/src/app/live-dl \
+	&& chmod +x /usr/src/app/autoscript.sh \
+	&& chmod +x /usr/src/app/config/
+RUN ln -s /usr/src/app/live-dl /usr/local/bin/live-dl && \
+	ln -s /usr/src/app/config /usr/local/bin/config
+
+EXPOSE 8080
+
+VOLUME ["/youtube-dl"]
+
+CMD [ "/usr/src/app/autoscript.sh" ]
