@@ -402,19 +402,19 @@ function func_debug_environment() {
     return
   fi
 
-  local ffmpeg_version="unavailable"
-  local yt_dlp_version="unavailable"
-  local os_pretty_name="unavailable"
+  local FFMPEG_VERSION="unavailable"
+  local YT_DLP_VERSION="unavailable"
+  local OS_PRETTY_NAME="unavailable"
 
-  ffmpeg_version=$(ffmpeg -version 2>&1 | awk 'NR==1{print $3}')
+  FFMPEG_VERSION=$(ffmpeg -version 2>&1 | awk 'NR==1{print $3}')
 
-  yt_dlp_version=$(yt-dlp --version 2>&1)
+  YT_DLP_VERSION=$(yt-dlp --version 2>&1)
 
-  os_pretty_name=$(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '"')
+  OS_PRETTY_NAME=$(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '"')
 
-  __debug "FFmpeg version: $ffmpeg_version"
-  __debug "yt-dlp version: $yt_dlp_version"
-  __debug "OS: $os_pretty_name"
+  __debug "FFmpeg version: $FFMPEG_VERSION"
+  __debug "yt-dlp version: $YT_DLP_VERSION"
+  __debug "OS: $OS_PRETTY_NAME"
 }
 
 function func_select_cookies() {
