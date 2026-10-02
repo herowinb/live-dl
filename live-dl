@@ -397,6 +397,26 @@ function func_check_update() {
     fi
 }
 
+function func_debug_environment() {
+  if [ "$PARAM_DEBUG" != "true" ]; then
+    return
+  fi
+
+  local ffmpeg_version="unavailable"
+  local yt_dlp_version="unavailable"
+  local os_pretty_name="unavailable"
+
+  ffmpeg_version=$(ffmpeg -version 2>&1 | awk 'NR==1{print $3}')
+
+  yt_dlp_version=$(yt-dlp --version 2>&1)
+
+  os_pretty_name=$(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '"')
+
+  __debug "FFmpeg version: $ffmpeg_version"
+  __debug "yt-dlp version: $yt_dlp_version"
+  __debug "OS: $os_pretty_name"
+}
+
 function func_select_cookies() {
 if [[ "$DL_OPTION" == "membership" ]] || [[ "$PARAM_MEMBERSHIP" == "true" ]] ; then
   # Select cookies_membership.txt for members only post
@@ -1988,6 +2008,8 @@ else
   MODE_AUDIO_TEXT=""
 fi
 
+# Get Debug environment
+func_debug_environment
 
 # Run check update first
 func_check_update
