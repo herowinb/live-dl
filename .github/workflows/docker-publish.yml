@@ -29,8 +29,6 @@ jobs:
             tags: latest
           - dockerfile: ./Dockerfile-ffmpeg8
             tags: ffmpeg8
-          - dockerfile: ./Dockerfile-ffmpeg-slim-bookworm
-            tags: ffmpeg5-slim
 
     steps:
       - name: Checkout repository

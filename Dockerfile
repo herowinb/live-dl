@@ -1,28 +1,44 @@
-FROM python:alpine3.22
+FROM python:slim-bookworm
 
-RUN apk add --no-cache ffmpeg==6.1.2-r2
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-RUN apk add --no-cache aria2 \
-	&& adduser -D aria2 \
-	&& mkdir -p /etc/aria2 \
-	&& mkdir -p /aria2down \
-	&& rm -rf /var/lib/apk/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    aria2 \
+    tzdata \
+    jq \
+    exiv2 \
+    bash \
+    curl \
+    perl \
+    coreutils \
+    grep \
+    git \
+    ca-certificates \
+    p7zip-full \
+	procps \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apk add --no-cache \
-  tzdata \
-  jq  \
-  exiv2  \
-  bash  \
-  curl  \
-  perl  \
-  coreutils \
-  grep \
-  deno \
-  git
 
-RUN pip install --no-cache-dir --upgrade "yt-dlp @ git+https://github.com/yt-dlp/yt-dlp.git"
-RUN pip install --no-cache-dir bottle yt-dlp-ejs yq
-RUN pip install https://github.com/Indigo128/chat-downloader/archive/refs/heads/master.zip
+RUN curl -fsSL https://deno.land/install.sh | sh \
+    && ln -s /root/.deno/bin/deno /usr/local/bin/deno
+
+RUN useradd --create-home --shell /bin/bash aria2 \
+    && mkdir -p /etc/aria2 \
+    && mkdir -p /aria2down
+
+RUN pip install --no-cache-dir --upgrade \
+    "yt-dlp @ git+https://github.com/yt-dlp/yt-dlp.git"
+
+RUN pip install --no-cache-dir \
+    bottle \
+    yt-dlp-ejs \
+    yq
+
+RUN pip install --no-cache-dir \
+    https://github.com/Indigo128/chat-downloader/archive/refs/heads/master.zip
 
 WORKDIR /usr/local/bin/
 
